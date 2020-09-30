@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          # dotnet-version: 5.0.100-preview.5.20279.10
+          dotnet-version: 3.1.102
+
+      - name: Get the version
+        id: get-version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Build client
+        run: |
+          dotnet build src/MyWeb/MyWeb.csproj
+
+      - name: Zip
+        run: |
+          dotnet publish src/MyWeb -o __publish__/MyWeb
+          (cd __publish__; zip -r MyWeb.zip MyWeb)
+
+      - name: Upload 1
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: __publish__/MyWeb.zip
+          asset_name: MyWeb.${{ steps.get-version.outputs.VERSION }}.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+      # - name: Push
+      #   run: |
+      #     sh build-login.sh
+      #     sh build-docker.sh  ${{ steps.get-version.outputs.VERSION }}
+      #     sh build-push.sh ${{ steps.get-version.outputs.VERSION }}
