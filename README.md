@@ -12,7 +12,3 @@ act -j build
 ```
 git tag v0.0.1
 ```
-
-## Issue
-
-- https://github.com/nektos/act/issues/356

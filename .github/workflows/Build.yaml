@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           # dotnet-version: 5.0.100-preview.5.20279.10
-          dotnet-version: 3.1.102
+          dotnet-version: 5.0.x
 
       - name: Get the version
         id: get-version
@@ -33,6 +33,7 @@ jobs:
           (cd __publish__; zip -r MyWeb.zip MyWeb)
 
       - name: Upload 1
+        if: ${{ !env.ACT }}
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
